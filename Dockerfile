@@ -1,9 +1,5 @@
-FROM ubuntu:16.04
-MAINTAINER Donal Byrne <byrnedo@tcd.ie>
-
-# Surpress Upstart errors/warning
-RUN dpkg-divert --local --rename --add /sbin/initctl
-RUN ln -sf /bin/true /sbin/initctl
+FROM debian:8
+MAINTAINER Daniel Ripoll <info@danielripoll.es>
 
 # Let the conatiner know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
@@ -13,25 +9,31 @@ ENV DEBIAN_FRONTEND noninteractive
 # Install software requirements
 #
 ENV IMAGE_PHP_VERSION=7.1
+RUN apt-get install wget curl
+RUN (echo 'deb http://packages.dotdeb.org/ jessie all'> /etc/apt/sources.d/dotdeb.list)
+RUN (echo 'deb-src http://packages.dotdeb.org/ jessie all > /etc/apt/sources.d/dotdeb.list)
+RUN (echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list)
+RUN (echo 'deb http://packages.dotdeb.org jessie-nginx-http2 all' > /etc/apt/sources.list.d/nginx.list)
+RUN (echo 'deb-src http://packages.dotdeb.org jessie-nginx-http2 all' > /etc/apt/sources.list.d/nginx.list)
+RUN wget https://www.dotdeb.org/dotdeb.gpg -O \
+    /tmp/dotdeb.gpg &&
+    apt-key add /tmp/dotdeb.gpg && \
+    rm /tmp/dotdeb.gpg
+
+
 RUN apt-get update && \
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
-apt-get install -y software-properties-common && \
-nginx=stable && \
-add-apt-repository ppa:nginx/$nginx && \
-add-apt-repository ppa:ondrej/php && \
-apt-get update && \
-apt-get upgrade -y && \
-BUILD_PACKAGES="supervisor nginx php${IMAGE_PHP_VERSION}-fpm git php${IMAGE_PHP_VERSION}-mysql php-apcu php${IMAGE_PHP_VERSION}-curl php${IMAGE_PHP_VERSION}-gd php${IMAGE_PHP_VERSION}-intl php${IMAGE_PHP_VERSION}-mcrypt php${IMAGE_PHP_VERSION}-memcache php${IMAGE_PHP_VERSION}-sqlite php${IMAGE_PHP_VERSION}-tidy php${IMAGE_PHP_VERSION}-xmlrpc php${IMAGE_PHP_VERSION}-xsl php${IMAGE_PHP_VERSION}-pgsql php${IMAGE_PHP_VERSION}-mongo php${IMAGE_PHP_VERSION}-ldap pwgen php${IMAGE_PHP_VERSION}-cli curl" && \
-apt-get -y install $BUILD_PACKAGES && \
-apt-get remove --purge -y software-properties-common && \
-apt-get autoremove -y && \
-apt-get clean && \
-apt-get autoclean && \
-echo -n > /var/lib/apt/extended_states && \
-rm -rf /var/lib/apt/lists/* && \
-rm -rf /usr/share/man/?? && \
-rm -rf /usr/share/man/??_* && \
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    apt-get update && \
+    apt-get upgrade -y && \
+    BUILD_PACKAGES="supervisor nginx php${IMAGE_PHP_VERSION}-fpm git php${IMAGE_PHP_VERSION}-mysql php-apcu php${IMAGE_PHP_VERSION}-curl php${IMAGE_PHP_VERSION}-gettext php${IMAGE_PHP_VERSION}-imap php${IMAGE_PHP_VERSION}-gmp php${IMAGE_PHP_VERSION}-pear php${IMAGE_PHP_VERSION}-mail php${IMAGE_PHP_VERSION}-net-socket php${IMAGE_PHP_VERSION}-net-smtp php${IMAGE_PHP_VERSION}-auth-sasl php${IMAGE_PHP_VERSION}-gd php${IMAGE_PHP_VERSION}-intl php${IMAGE_PHP_VERSION}-mcrypt php${IMAGE_PHP_VERSION}-memcache php${IMAGE_PHP_VERSION}-sqlite php${IMAGE_PHP_VERSION}-tidy php${IMAGE_PHP_VERSION}-xmlrpc php${IMAGE_PHP_VERSION}-xsl php${IMAGE_PHP_VERSION}-pgsql pwgen php${IMAGE_PHP_VERSION}-cli" && \
+    apt-get -y install $BUILD_PACKAGES && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    apt-get autoclean && \
+    echo -n > /var/lib/apt/extended_states && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /usr/share/man/?? && \
+    rm -rf /usr/share/man/??_* && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # tweak nginx config
 RUN sed -i -e"s/worker_processes  1/worker_processes 5/" /etc/nginx/nginx.conf && \
