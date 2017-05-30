@@ -11,10 +11,10 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV IMAGE_PHP_VERSION=7.1
 RUN apt-get install wget curl
 RUN (echo 'deb http://packages.dotdeb.org/ jessie all'> /etc/apt/sources.d/dotdeb.list)
-RUN (echo 'deb-src http://packages.dotdeb.org/ jessie all > /etc/apt/sources.d/dotdeb.list)
+RUN (echo 'deb-src http://packages.dotdeb.org/ jessie all >> /etc/apt/sources.d/dotdeb.list)
 RUN (echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list)
 RUN (echo 'deb http://packages.dotdeb.org jessie-nginx-http2 all' > /etc/apt/sources.list.d/nginx.list)
-RUN (echo 'deb-src http://packages.dotdeb.org jessie-nginx-http2 all' > /etc/apt/sources.list.d/nginx.list)
+RUN (echo 'deb-src http://packages.dotdeb.org jessie-nginx-http2 all' >> /etc/apt/sources.list.d/nginx.list)
 RUN wget https://www.dotdeb.org/dotdeb.gpg -O \
     /tmp/dotdeb.gpg &&
     apt-key add /tmp/dotdeb.gpg && \
