@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  nginx:
+    image: justdevzero/debian-nginx-php7
+    volumes:
+      - 'www:/var/www'
+      - 'log:/var/log/nginx'
+      - 'etc:/etc/mongodb'
+    ports:
+      - '443:443'
+      - '80:80'
+volumes:
+  www:
+    driver: local
+  log:
+    driver: local
+  etc:
+    driver: local
