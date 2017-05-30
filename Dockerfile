@@ -16,7 +16,7 @@ RUN (echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/s
 RUN (echo 'deb http://packages.dotdeb.org jessie-nginx-http2 all' > /etc/apt/sources.list.d/nginx.list)
 RUN (echo 'deb-src http://packages.dotdeb.org jessie-nginx-http2 all' >> /etc/apt/sources.list.d/nginx.list)
 RUN wget https://www.dotdeb.org/dotdeb.gpg -O \
-    /tmp/dotdeb.gpg &&
+    /tmp/dotdeb.gpg && \
     apt-key add /tmp/dotdeb.gpg && \
     rm /tmp/dotdeb.gpg
 
